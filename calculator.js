@@ -184,7 +184,7 @@ const equals = document.getElementById('eqbutton');
 equals.addEventListener('click', pressEquals);
 
 document.addEventListener('keydown', function(event) {
-  event.preventDefault();
+
   let keyName = event.key;
   console.log('key name is', keyName, 'event.key is', event.key);
   if ((Number(keyName) >= 0 || Number(keyName) <= 9)
@@ -192,6 +192,7 @@ document.addEventListener('keydown', function(event) {
     temporaryNums += Number(keyName);
     changeScreen();
   } else if (keyName === '=' || keyName === 'Enter') {
+      event.preventDefault();
       pressEquals();
   } else if (keyName === '+' || keyName === '-') {
       let text = keyName;
@@ -213,13 +214,3 @@ document.addEventListener('keydown', function(event) {
       pressDecimal();
   }
 });
-
-//This event listener exists because putting event.key === 'Enter' in
-//the previous anonymous function did not actually trigger anything
-//happening. Why? I do not know. The code is the exact same. Explain
-// //this to me, please.
-// document.addEventListener('keydown', function(event) {
-//   if (event.key === 'Enter') {
-//     pressEquals();
-//   }
-// });
