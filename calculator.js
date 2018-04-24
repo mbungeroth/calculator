@@ -66,25 +66,25 @@ function pressEquals() {
         let operator = numsAndOperations[i];
         let num1 = numsAndOperations[i - 1];
         let num2 = numsAndOperations[i + 1];
-        if (operator === 'x') {
+        if (operator === '*') {
           numsAndOperations[i - 1] = operations.multiply(num1, num2);
           numsAndOperations.splice(i, 2);
           i -= 2;
-        } else if (operator === '÷') {
+        } else if (operator === '/') {
           numsAndOperations[i - 1] = operations.divide(num1, num2);
           numsAndOperations.splice(i, 2);
           i -= 2;
         } else if (operator === '+') {
-          let safeToAdd = (numsAndOperations.indexOf('x') < 0 &&
-                           numsAndOperations.indexOf('÷') < 0)
+          let safeToAdd = (numsAndOperations.indexOf('*') < 0 &&
+                           numsAndOperations.indexOf('/') < 0)
           if (safeToAdd) {
             numsAndOperations[i - 1] = operations.add(num1, num2);
             numsAndOperations.splice(i, 2);
             i -= 2;
           }
         } else {
-          let safeToSubtract = (numsAndOperations.indexOf('x') < 0 &&
-                                numsAndOperations.indexOf('÷') < 0)
+          let safeToSubtract = (numsAndOperations.indexOf('*') < 0 &&
+                                numsAndOperations.indexOf('/') < 0)
           if (safeToSubtract) {
             numsAndOperations[i - 1] = operations.subtract(num1, num2);
             numsAndOperations.splice(i, 2);
@@ -175,41 +175,18 @@ document.addEventListener('keydown', function(event) {
        && temporaryNums.length < 8) {
     temporaryNums += Number(keyName);
     changeScreen();
-  } else if (keyName === '=') {
+  } else if (['+', '-', '*', '/'].includes(keyName)){
+      numsAndOperations.push(Number(temporaryNums));
+      numsAndOperations.push(keyName);
+      temporaryNums = '';
+      changeScreen(keyName);
+  } else if (keyName === '=' || keyName === 'Enter') {
       pressEquals();
-  } else if (keyName === '+' || keyName === '-') {
-      numsAndOperations.push(Number(temporaryNums));
-      let text = keyName;
-      numsAndOperations.push(text);
-      temporaryNums = '';
-      changeScreen(text);
-  } else if (keyName === '*') {
-      numsAndOperations.push(Number(temporaryNums));
-      let text = 'x';
-      numsAndOperations.push(text);
-      temporaryNums = '';
-      changeScreen(text);
-  } else if (keyName === '/') {
-      numsAndOperations.push(Number(temporaryNums));
-      let text = '÷';
-      numsAndOperations.push(text);
-      temporaryNums = '';
-      changeScreen(text);
   } else if (keyName === 'Clear') {
       pressClear();
   } else if (keyName === 'Backspace' || keyName === 'Delete') {
       pressDelete();
   } else if (keyName === '.') {
       pressDecimal();
-  }
-});
-
-//This event listener exists because putting event.key === 'Enter' in
-//the previous anonymous function did not actually trigger anything
-//happening. Why? I do not know. The code is the exact same. Explain
-//this to me, please.
-document.addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    pressEquals();
   }
 });
