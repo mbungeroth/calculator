@@ -30,6 +30,33 @@ function changeScreen(specialInstruction = 'none') {
   }
 }
 
+function pushNumAndOperation(sign) {
+  if (temporaryNums.length > 0) {
+    numsAndOperations.push(Number(temporaryNums));
+  }
+  if (numsAndOperations[numsAndOperations.length - 1] === '+' ||
+      numsAndOperations[numsAndOperations.length - 1] === '-' ||
+      numsAndOperations[numsAndOperations.length - 1] === 'x' ||
+      numsAndOperations[numsAndOperations.length - 1] === '÷') {
+    numsAndOperations[numsAndOperations.length - 1] = sign;
+  } else {
+    numsAndOperations.push(sign);
+  }
+  temporaryNums = '';
+}
+
+function switchSigns() {
+  if (temporaryNums.length === 0) {
+    return;
+  } else if (temporaryNums[0] !== '-') {
+    temporaryNums = '-' + temporaryNums;
+    changeScreen()
+  } else {
+    temporaryNums = temporaryNums.slice(1);
+    changeScreen();
+  }
+}
+
 function pressClear() {
   temporaryNums = '';
   changeScreen('clear');
@@ -50,7 +77,7 @@ function pressDecimal() {
   if (temporaryNums.length === 0) {
     temporaryNums += '0.';
     changeScreen();
-  } else {
+  } else if (temporaryNums.indexOf('.') < 0) {
     temporaryNums += '.';
     changeScreen();
   }
@@ -119,25 +146,13 @@ const deleteKey = document.getElementById('delete');
 deleteKey.addEventListener('click', pressDelete);
 
 const negative = document.getElementById('negative');
-negative.addEventListener('click', function() {
-  if (temporaryNums.length === 0) {
-    return;
-  } else if (temporaryNums[0] !== '-') {
-    temporaryNums = '-' + temporaryNums;
-    changeScreen()
-  } else {
-    temporaryNums = temporaryNums.slice(1);
-    changeScreen();
-  }
-});
+negative.addEventListener('click', switchSigns);
 
 const operationButtons = document.querySelectorAll('.operation');
 operationButtons.forEach(function(currentBut) {
   currentBut.addEventListener('click', function() {
-    numsAndOperations.push(Number(temporaryNums));
     let text = currentBut.textContent;
-    numsAndOperations.push(text);
-    temporaryNums = '';
+    pushNumAndOperation(text);
     changeScreen(text);
   });
 });
@@ -169,31 +184,26 @@ const equals = document.getElementById('eqbutton');
 equals.addEventListener('click', pressEquals);
 
 document.addEventListener('keydown', function(event) {
+  event.preventDefault();
   let keyName = event.key;
   console.log('key name is', keyName, 'event.key is', event.key);
   if ((Number(keyName) >= 0 || Number(keyName) <= 9)
        && temporaryNums.length < 8) {
     temporaryNums += Number(keyName);
     changeScreen();
-  } else if (keyName === '=') {
+  } else if (keyName === '=' || keyName === 'Enter') {
       pressEquals();
   } else if (keyName === '+' || keyName === '-') {
-      numsAndOperations.push(Number(temporaryNums));
       let text = keyName;
-      numsAndOperations.push(text);
-      temporaryNums = '';
+      pushNumAndOperation(text);
       changeScreen(text);
   } else if (keyName === '*') {
-      numsAndOperations.push(Number(temporaryNums));
       let text = 'x';
-      numsAndOperations.push(text);
-      temporaryNums = '';
+      pushNumAndOperation(text);
       changeScreen(text);
   } else if (keyName === '/') {
-      numsAndOperations.push(Number(temporaryNums));
       let text = '÷';
-      numsAndOperations.push(text);
-      temporaryNums = '';
+      pushNumAndOperation(text);
       changeScreen(text);
   } else if (keyName === 'Clear') {
       pressClear();
@@ -207,9 +217,9 @@ document.addEventListener('keydown', function(event) {
 //This event listener exists because putting event.key === 'Enter' in
 //the previous anonymous function did not actually trigger anything
 //happening. Why? I do not know. The code is the exact same. Explain
-//this to me, please.
-document.addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    pressEquals();
-  }
-});
+// //this to me, please.
+// document.addEventListener('keydown', function(event) {
+//   if (event.key === 'Enter') {
+//     pressEquals();
+//   }
+// });
