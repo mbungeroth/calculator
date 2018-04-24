@@ -184,7 +184,6 @@ const equals = document.getElementById('eqbutton');
 equals.addEventListener('click', pressEquals);
 
 document.addEventListener('keydown', function(event) {
-
   let keyName = event.key;
   console.log('key name is', keyName, 'event.key is', event.key);
   if ((Number(keyName) >= 0 || Number(keyName) <= 9)
