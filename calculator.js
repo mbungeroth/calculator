@@ -30,6 +30,31 @@ function changeScreen(specialInstruction = 'none') {
   }
 }
 
+function pushNumAndOperation(sign) {
+  console.log("sign is...", sign)
+  if (temporaryNums.length > 0) {
+    numsAndOperations.push(Number(temporaryNums));
+  }
+  if (['+', '-', '*', '/'].includes(numsAndOperations[numsAndOperations.length - 1])) {
+    numsAndOperations[numsAndOperations.length - 1] = sign;
+  } else {
+    numsAndOperations.push(sign);
+  }
+  temporaryNums = '';
+}
+
+function switchSigns() {
+  if (temporaryNums.length === 0) {
+    return;
+  } else if (temporaryNums[0] !== '-') {
+    temporaryNums = '-' + temporaryNums;
+    changeScreen()
+  } else {
+    temporaryNums = temporaryNums.slice(1);
+    changeScreen();
+  }
+}
+
 function pressClear() {
   temporaryNums = '';
   changeScreen('clear');
@@ -50,7 +75,7 @@ function pressDecimal() {
   if (temporaryNums.length === 0) {
     temporaryNums += '0.';
     changeScreen();
-  } else {
+  } else if (temporaryNums.indexOf('.') < 0) {
     temporaryNums += '.';
     changeScreen();
   }
@@ -119,25 +144,13 @@ const deleteKey = document.getElementById('delete');
 deleteKey.addEventListener('click', pressDelete);
 
 const negative = document.getElementById('negative');
-negative.addEventListener('click', function() {
-  if (temporaryNums.length === 0) {
-    return;
-  } else if (temporaryNums[0] !== '-') {
-    temporaryNums = '-' + temporaryNums;
-    changeScreen()
-  } else {
-    temporaryNums = temporaryNums.slice(1);
-    changeScreen();
-  }
-});
+negative.addEventListener('click', switchSigns);
 
 const operationButtons = document.querySelectorAll('.operation');
 operationButtons.forEach(function(currentBut) {
   currentBut.addEventListener('click', function() {
-    numsAndOperations.push(Number(temporaryNums));
     let text = currentBut.textContent;
-    numsAndOperations.push(text);
-    temporaryNums = '';
+    pushNumAndOperation(text);
     changeScreen(text);
   });
 });
@@ -176,11 +189,10 @@ document.addEventListener('keydown', function(event) {
     temporaryNums += Number(keyName);
     changeScreen();
   } else if (['+', '-', '*', '/'].includes(keyName)){
-      numsAndOperations.push(Number(temporaryNums));
-      numsAndOperations.push(keyName);
-      temporaryNums = '';
+      pushNumAndOperation(text);
       changeScreen(keyName);
   } else if (keyName === '=' || keyName === 'Enter') {
+      event.preventDefault();
       pressEquals();
   } else if (keyName === 'Clear') {
       pressClear();
