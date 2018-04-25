@@ -31,7 +31,6 @@ function changeScreen(specialInstruction = 'none') {
 }
 
 function pushNumAndOperation(sign) {
-  console.log("sign is...", sign)
   if (temporaryNums.length > 0) {
     numsAndOperations.push(Number(temporaryNums));
   }
@@ -108,8 +107,8 @@ function pressEquals() {
             i -= 2;
           }
         } else {
-          let safeToSubtract = (numsAndOperations.indexOf('*') < 0 &&
-                                numsAndOperations.indexOf('/') < 0)
+          let safeToSubtract = (numsAndOperations.indexOf('x') < 0 &&
+                                numsAndOperations.indexOf('÷') < 0)
           if (safeToSubtract) {
             numsAndOperations[i - 1] = operations.subtract(num1, num2);
             numsAndOperations.splice(i, 2);
@@ -149,7 +148,7 @@ negative.addEventListener('click', switchSigns);
 const operationButtons = document.querySelectorAll('.operation');
 operationButtons.forEach(function(currentBut) {
   currentBut.addEventListener('click', function() {
-    let text = currentBut.textContent;
+    let text = currentBut.value;
     pushNumAndOperation(text);
     changeScreen(text);
   });
@@ -182,6 +181,7 @@ const equals = document.getElementById('eqbutton');
 equals.addEventListener('click', pressEquals);
 
 document.addEventListener('keydown', function(event) {
+  event.preventDefault();
   let keyName = event.key;
   console.log('key name is', keyName, 'event.key is', event.key);
   if ((Number(keyName) >= 0 || Number(keyName) <= 9)
@@ -189,10 +189,9 @@ document.addEventListener('keydown', function(event) {
     temporaryNums += Number(keyName);
     changeScreen();
   } else if (['+', '-', '*', '/'].includes(keyName)){
-      pushNumAndOperation(text);
+      pushNumAndOperation(keyName);
       changeScreen(keyName);
   } else if (keyName === '=' || keyName === 'Enter') {
-      event.preventDefault();
       pressEquals();
   } else if (keyName === 'Clear') {
       pressClear();
